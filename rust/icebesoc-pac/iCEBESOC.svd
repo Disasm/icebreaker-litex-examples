@@ -2,7 +2,7 @@
 
 <device schemaVersion="1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD.xsd" >
     <vendor>litex</vendor>
-    <name>LEDS</name>
+    <name>USB</name>
 
     <addressUnitBits>8</addressUnitBits>
     <width>32</width>
@@ -468,6 +468,486 @@ to perform half-duplex operations, using this SPI core.]]></description>
             <addressBlock>
                 <offset>0</offset>
                 <size>0x4</size>
+                <usage>registers</usage>
+            </addressBlock>
+        </peripheral>
+        <peripheral>
+            <name>USB</name>
+            <baseAddress>0xE0003800</baseAddress>
+            <groupName>USB</groupName>
+            <registers>
+                <register>
+                    <name>PULLUP_OUT</name>
+                    <addressOffset>0x0000</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>pullup_out</name>
+                            <msb>0</msb>
+                            <bitRange>[0:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>ADDRESS</name>
+                    <description><![CDATA[Sets the USB device address, in order to ignore packets going to other devices
+on the bus. This value is reset when the host issues a USB Device Reset
+condition.]]></description>
+                    <addressOffset>0x0004</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>addr</name>
+                            <msb>6</msb>
+                            <bitRange>[6:0]</bitRange>
+                            <lsb>0</lsb>
+                            <description><![CDATA[Write the USB address from USB ``SET_ADDRESS`` packets.]]></description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>NEXT_EV</name>
+                    <description><![CDATA[In ``eptri``, there are three endpoints.  It is possible for an IRQ to fire and
+have all three bits set.  Under these circumstances it can be difficult to know
+which event to process first.  Use this register to determine which event needs
+to be processed first. Only one bit will ever be set at a time.]]></description>
+                    <addressOffset>0x0008</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-only</access>
+                    <fields>
+                        <field>
+                            <name>in</name>
+                            <msb>0</msb>
+                            <bitRange>[0:0]</bitRange>
+                            <lsb>0</lsb>
+                            <description><![CDATA[``1`` if the next event is an ``IN`` event]]></description>
+                        </field>
+                        <field>
+                            <name>out</name>
+                            <msb>1</msb>
+                            <bitRange>[1:1]</bitRange>
+                            <lsb>1</lsb>
+                            <description><![CDATA[``1`` if the next event is an ``OUT`` event]]></description>
+                        </field>
+                        <field>
+                            <name>setup</name>
+                            <msb>2</msb>
+                            <bitRange>[2:2]</bitRange>
+                            <lsb>2</lsb>
+                            <description><![CDATA[``1`` if the next event is an ``SETUP`` event]]></description>
+                        </field>
+                        <field>
+                            <name>reset</name>
+                            <msb>3</msb>
+                            <bitRange>[3:3]</bitRange>
+                            <lsb>3</lsb>
+                            <description><![CDATA[``1`` if the next event is a ``RESET`` event]]></description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>SETUP_DATA</name>
+                    <description><![CDATA[Data from the last ``SETUP`` transactions.  It will be 10 bytes long, because it
+will include the CRC16.  This is a FIFO, and the queue is advanced
+automatically.]]></description>
+                    <addressOffset>0x000c</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-only</access>
+                    <fields>
+                        <field>
+                            <name>data</name>
+                            <msb>7</msb>
+                            <bitRange>[7:0]</bitRange>
+                            <lsb>0</lsb>
+                            <description><![CDATA[The next byte of ``SETUP`` data]]></description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>SETUP_CTRL</name>
+                    <description><![CDATA[Controls for managing how to handle ``SETUP`` transactions.]]></description>
+                    <addressOffset>0x0010</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>reset</name>
+                            <msb>5</msb>
+                            <bitRange>[5:5]</bitRange>
+                            <lsb>5</lsb>
+                            <description><![CDATA[Write a ``1`` here to reset the `SETUP` handler.]]></description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>SETUP_STATUS</name>
+                    <description><![CDATA[Status about the most recent ``SETUP`` transactions, and the state of the FIFO.]]></description>
+                    <addressOffset>0x0014</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-only</access>
+                    <fields>
+                        <field>
+                            <name>epno</name>
+                            <msb>3</msb>
+                            <bitRange>[3:0]</bitRange>
+                            <lsb>0</lsb>
+                            <description><![CDATA[The destination endpoint for the most recent SETUP token.]]></description>
+                        </field>
+                        <field>
+                            <name>have</name>
+                            <msb>4</msb>
+                            <bitRange>[4:4]</bitRange>
+                            <lsb>4</lsb>
+                            <description><![CDATA[``1`` if there is data in the FIFO.]]></description>
+                        </field>
+                        <field>
+                            <name>pend</name>
+                            <msb>5</msb>
+                            <bitRange>[5:5]</bitRange>
+                            <lsb>5</lsb>
+                            <description><![CDATA[``1`` if there is an IRQ pending.]]></description>
+                        </field>
+                        <field>
+                            <name>is_in</name>
+                            <msb>6</msb>
+                            <bitRange>[6:6]</bitRange>
+                            <lsb>6</lsb>
+                            <description><![CDATA[``1`` if an IN stage was detected.]]></description>
+                        </field>
+                        <field>
+                            <name>data</name>
+                            <msb>7</msb>
+                            <bitRange>[7:7]</bitRange>
+                            <lsb>7</lsb>
+                            <description><![CDATA[``1`` if a DATA stage is expected.]]></description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>SETUP_EV_STATUS</name>
+                    <addressOffset>0x0018</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>setup_ev_status</name>
+                            <msb>1</msb>
+                            <bitRange>[1:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>SETUP_EV_PENDING</name>
+                    <addressOffset>0x001c</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>setup_ev_pending</name>
+                            <msb>1</msb>
+                            <bitRange>[1:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>SETUP_EV_ENABLE</name>
+                    <addressOffset>0x0020</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>setup_ev_enable</name>
+                            <msb>1</msb>
+                            <bitRange>[1:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>IN_DATA</name>
+                    <description><![CDATA[Each byte written into this register gets added to an outgoing FIFO. Any bytes
+that are written here will be transmitted in the order in which they were added.
+The FIFO queue is automatically advanced with each write. The FIFO queue is 64
+bytes deep.  If you exceed this amount, the result is undefined.]]></description>
+                    <addressOffset>0x0024</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>data</name>
+                            <msb>7</msb>
+                            <bitRange>[7:0]</bitRange>
+                            <lsb>0</lsb>
+                            <description><![CDATA[The next byte to add to the queue.]]></description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>IN_CTRL</name>
+                    <description><![CDATA[Enables transmission of data in response to ``IN`` tokens, or resets the
+contents of the FIFO.]]></description>
+                    <addressOffset>0x0028</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>epno</name>
+                            <msb>3</msb>
+                            <bitRange>[3:0]</bitRange>
+                            <lsb>0</lsb>
+                            <description><![CDATA[The endpoint number for the transaction that is queued in the FIFO.]]></description>
+                        </field>
+                        <field>
+                            <name>reset</name>
+                            <msb>5</msb>
+                            <bitRange>[5:5]</bitRange>
+                            <lsb>5</lsb>
+                            <description><![CDATA[Write a ``1`` here to clear the contents of the FIFO.]]></description>
+                        </field>
+                        <field>
+                            <name>stall</name>
+                            <msb>6</msb>
+                            <bitRange>[6:6]</bitRange>
+                            <lsb>6</lsb>
+                            <description><![CDATA[Write a ``1`` here to stall the EP written in ``EP``.]]></description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>IN_STATUS</name>
+                    <description><![CDATA[Status about the IN handler.  As soon as you write to `IN_DATA`,
+``IN_STATUS.HAVE`` should go to ``1``.]]></description>
+                    <addressOffset>0x002c</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-only</access>
+                    <fields>
+                        <field>
+                            <name>idle</name>
+                            <msb>0</msb>
+                            <bitRange>[0:0]</bitRange>
+                            <lsb>0</lsb>
+                            <description><![CDATA[This value is ``1`` if the packet has finished transmitting.]]></description>
+                        </field>
+                        <field>
+                            <name>have</name>
+                            <msb>4</msb>
+                            <bitRange>[4:4]</bitRange>
+                            <lsb>4</lsb>
+                            <description><![CDATA[This value is ``0`` if the FIFO is empty.]]></description>
+                        </field>
+                        <field>
+                            <name>pend</name>
+                            <msb>5</msb>
+                            <bitRange>[5:5]</bitRange>
+                            <lsb>5</lsb>
+                            <description><![CDATA[``1`` if there is an IRQ pending.]]></description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>IN_EV_STATUS</name>
+                    <addressOffset>0x0030</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>in_ev_status</name>
+                            <msb>0</msb>
+                            <bitRange>[0:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>IN_EV_PENDING</name>
+                    <addressOffset>0x0034</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>in_ev_pending</name>
+                            <msb>0</msb>
+                            <bitRange>[0:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>IN_EV_ENABLE</name>
+                    <addressOffset>0x0038</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>in_ev_enable</name>
+                            <msb>0</msb>
+                            <bitRange>[0:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>OUT_DATA</name>
+                    <description><![CDATA[Data received from the host will go into a FIFO.  This register reflects the
+contents of the top byte in that FIFO.  Reading from this register advances the
+FIFO pointer.]]></description>
+                    <addressOffset>0x003c</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-only</access>
+                    <fields>
+                        <field>
+                            <name>data</name>
+                            <msb>7</msb>
+                            <bitRange>[7:0]</bitRange>
+                            <lsb>0</lsb>
+                            <description><![CDATA[The top byte of the receive FIFO.]]></description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>OUT_CTRL</name>
+                    <description><![CDATA[Controls for receiving packet data.  To enable an endpoint, write its value to
+``epno``, with the ``enable`` bit set to ``1`` to enable an endpoint, or ``0``
+to disable it. Resetting the OutHandler will set all ``enable`` bits to 0.
+
+Similarly, you can adjust the ``STALL`` state by setting or clearing the
+``stall`` bit.]]></description>
+                    <addressOffset>0x0040</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>epno</name>
+                            <msb>3</msb>
+                            <bitRange>[3:0]</bitRange>
+                            <lsb>0</lsb>
+                            <description><![CDATA[The endpoint number to update the ``enable`` and ``status`` bits for.]]></description>
+                        </field>
+                        <field>
+                            <name>enable</name>
+                            <msb>4</msb>
+                            <bitRange>[4:4]</bitRange>
+                            <lsb>4</lsb>
+                            <description><![CDATA[Write a ``1`` here to enable receiving data]]></description>
+                        </field>
+                        <field>
+                            <name>reset</name>
+                            <msb>5</msb>
+                            <bitRange>[5:5]</bitRange>
+                            <lsb>5</lsb>
+                            <description><![CDATA[Write a ``1`` here to reset the ``OUT`` handler]]></description>
+                        </field>
+                        <field>
+                            <name>stall</name>
+                            <msb>6</msb>
+                            <bitRange>[6:6]</bitRange>
+                            <lsb>6</lsb>
+                            <description><![CDATA[Write a ``1`` here to stall an endpoint]]></description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>OUT_STATUS</name>
+                    <description><![CDATA[Status about the current state of the `OUT` endpoint.]]></description>
+                    <addressOffset>0x0044</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-only</access>
+                    <fields>
+                        <field>
+                            <name>epno</name>
+                            <msb>3</msb>
+                            <bitRange>[3:0]</bitRange>
+                            <lsb>0</lsb>
+                            <description><![CDATA[The destination endpoint for the most recent ``OUT`` packet.]]></description>
+                        </field>
+                        <field>
+                            <name>have</name>
+                            <msb>4</msb>
+                            <bitRange>[4:4]</bitRange>
+                            <lsb>4</lsb>
+                            <description><![CDATA[``1`` if there is data in the FIFO.]]></description>
+                        </field>
+                        <field>
+                            <name>pend</name>
+                            <msb>5</msb>
+                            <bitRange>[5:5]</bitRange>
+                            <lsb>5</lsb>
+                            <description><![CDATA[``1`` if there is an IRQ pending.]]></description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>OUT_EV_STATUS</name>
+                    <addressOffset>0x0048</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>out_ev_status</name>
+                            <msb>0</msb>
+                            <bitRange>[0:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>OUT_EV_PENDING</name>
+                    <addressOffset>0x004c</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>out_ev_pending</name>
+                            <msb>0</msb>
+                            <bitRange>[0:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>OUT_EV_ENABLE</name>
+                    <addressOffset>0x0050</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>out_ev_enable</name>
+                            <msb>0</msb>
+                            <bitRange>[0:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
+            </registers>
+            <addressBlock>
+                <offset>0</offset>
+                <size>0x54</size>
                 <usage>registers</usage>
             </addressBlock>
         </peripheral>

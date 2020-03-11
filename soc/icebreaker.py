@@ -36,7 +36,7 @@ from litex.soc.cores.uart import UARTWishboneBridge
 from rtl.leds import Leds
 
 from valentyusb.usbcore import io as usbio
-from valentyusb.usbcore.cpu import dummyusb
+from valentyusb.usbcore.cpu import eptri
 
 import litex.soc.doc as lxsocdoc
 from litex.soc.integration import export
@@ -189,7 +189,8 @@ class BaseSoC(SoCCore):
         platform.add_extension(usb_pmod)
         usb_pads = platform.request("usb")
         usb_iobuf = usbio.IoBuf(usb_pads.d_p, usb_pads.d_n, usb_pads.pullup)
-        self.submodules.usb = dummyusb.DummyUsb(usb_iobuf)
+        self.submodules.usb = eptri.TriEndpointInterface(usb_iobuf)
+        self.add_csr("usb")
 
     def set_yosys_nextpnr_settings(self, nextpnr_seed=0, nextpnr_placer="heap"):
         """Set Yosys/Nextpnr settings by overriding default LiteX's settings.
