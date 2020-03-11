@@ -29,14 +29,28 @@ from litex.soc.integration.soc_core import soc_core_argdict, soc_core_args
 from litex.soc.integration.doc import AutoDoc
 
 from litex_boards.platforms.icebreaker import Platform
+from litex.build.generic_platform import Subsignal, IOStandard, Pins
 
 from litex.soc.interconnect import wishbone
 from litex.soc.cores.uart import UARTWishboneBridge
 from rtl.leds import Leds
 
+from valentyusb.usbcore import io as usbio
+from valentyusb.usbcore.cpu import dummyusb
+
 import litex.soc.doc as lxsocdoc
 from litex.soc.integration import export
 from litex.build.tools import write_to_file
+
+
+usb_pmod = [
+    ("usb", 0,
+        Subsignal("d_p", Pins("PMOD1A:2")),
+        Subsignal("d_n", Pins("PMOD1A:3")),
+        Subsignal("pullup", Pins("PMOD1A:1")),
+        IOStandard("LVCMOS33")
+    )
+]
 
 
 class JumpToAddressROM(wishbone.SRAM):
@@ -59,6 +73,8 @@ class _CRG(Module, AutoDoc):
     def __init__(self, platform):
         self.clock_domains.cd_sys = ClockDomain()
         self.clock_domains.cd_por = ClockDomain()
+        self.clock_domains.cd_usb_12 = ClockDomain()
+        self.clock_domains.cd_usb_48 = ClockDomain()
         self.reset = Signal()
 
         # # #
@@ -67,9 +83,23 @@ class _CRG(Module, AutoDoc):
         # Clocks
         clk12 = platform.request("clk12")
         platform.add_period_constraint(clk12, 1e9 / 12e6)
+        platform.add_period_constraint(self.cd_usb_12.clk, 1e9 / 12e6)
         self.comb += self.cd_sys.clk.eq(clk12)
         self.comb += self.cd_por.clk.eq(clk12)
+        self.comb += self.cd_usb_12.clk.eq(clk12)
         self.comb += self.cd_sys.rst.eq(reset_delay != 0)
+        self.comb += self.cd_usb_12.rst.eq(reset_delay != 0)
+
+        # 48MHz oscillator
+        clk48 = Signal()
+        self.specials += Instance(
+            "SB_HFOSC",
+            i_CLKHFPU=1,
+            i_CLKHFEN=1,
+            o_CLKHF=clk48
+        )
+        platform.add_period_constraint(clk48, 1e9 / 48e6)
+        self.comb += self.cd_usb_48.clk.eq(clk48)
 
         # Power On Reset
         self.sync.por += If(reset_delay != 0, reset_delay.eq(reset_delay - 1))
@@ -154,6 +184,12 @@ class BaseSoC(SoCCore):
                 ["ledg", "The Green LED on the main iCEBreaker board."]])
 
         self.add_csr("leds")
+
+        # Add USB pads, as well as the appropriate USB controller.
+        platform.add_extension(usb_pmod)
+        usb_pads = platform.request("usb")
+        usb_iobuf = usbio.IoBuf(usb_pads.d_p, usb_pads.d_n, usb_pads.pullup)
+        self.submodules.usb = dummyusb.DummyUsb(usb_iobuf)
 
     def set_yosys_nextpnr_settings(self, nextpnr_seed=0, nextpnr_placer="heap"):
         """Set Yosys/Nextpnr settings by overriding default LiteX's settings.

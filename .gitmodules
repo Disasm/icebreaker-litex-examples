@@ -7,3 +7,6 @@
 [submodule "soc/deps/litex-boards"]
 	path = soc/deps/litex-boards
 	url = https://github.com/litex-hub/litex-boards.git
+[submodule "soc/deps/valentyusb"]
+	path = soc/deps/valentyusb
+	url = https://github.com/im-tomu/valentyusb.git
