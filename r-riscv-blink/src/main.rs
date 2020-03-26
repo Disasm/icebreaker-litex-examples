@@ -13,6 +13,8 @@ mod usb_eptri;
 
 use timer::Timer;
 use leds::Leds;
+use usb_eptri::Usb;
+use usb_device::prelude::*;
 
 const SYSTEM_CLOCK_FREQUENCY: u32 = 12_000_000;
 
@@ -25,12 +27,28 @@ fn main() -> ! {
     print::print_hardware::set_hardware(peripherals.UART);
     let mut timer = Timer::new(peripherals.TIMER0);
     let mut leds = Leds::new(peripherals.LEDS);
-    leds.set(false, true);
+    leds.off();
+
+    println!("starting...");
+
+    let usb = peripherals.USB;
+
+    // Disconnect from bus
+    usb.pullup_out.write(|w| w.pullup_out().clear_bit());
+    msleep(&mut timer, 100);
+
+    let usb_bus = Usb::new(usb);
+
+    let mut usb_dev = UsbDeviceBuilder::new(usb_bus, UsbVidPid(0x16c0, 0x27dd))
+        .manufacturer("Fake company")
+        .product("Enumeration test")
+        .serial_number("iCEBreaker")
+        .build();
 
     loop {
-        print!("a");
-        leds.toggle();
-        msleep(&mut timer, 80);
+        if usb_dev.poll(&mut []) {
+            leds.toggle_mask(0b10);
+        }
     }
 }
 
