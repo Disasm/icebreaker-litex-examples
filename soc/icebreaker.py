@@ -81,25 +81,32 @@ class _CRG(Module, AutoDoc):
         reset_delay = Signal(12, reset=4095)
 
         # Clocks
-        clk12 = platform.request("clk12")
-        platform.add_period_constraint(clk12, 1e9 / 12e6)
+        clk12_ext = platform.request("clk12")
+        clk12 = Signal()
+        clk48 = Signal()
+        pll_locked = Signal()
+        self.specials += Instance(
+            "SB_PLL40_2_PAD",
+            p_FEEDBACK_PATH="SIMPLE",
+            p_DIVR=0,
+            p_DIVF=63,
+            p_DIVQ=4,
+            p_FILTER_RANGE=1,
+            i_RESETB=1,
+            i_BYPASS=0,
+            i_PACKAGEPIN=clk12_ext,
+            o_PLLOUTGLOBALA=clk12,
+            o_PLLOUTGLOBALB=clk48,
+            o_LOCK=pll_locked,
+        )
+        platform.add_period_constraint(self.cd_usb_48.clk, 1e9 / 48e6)
         platform.add_period_constraint(self.cd_usb_12.clk, 1e9 / 12e6)
         self.comb += self.cd_sys.clk.eq(clk12)
         self.comb += self.cd_por.clk.eq(clk12)
         self.comb += self.cd_usb_12.clk.eq(clk12)
+        self.comb += self.cd_usb_48.clk.eq(clk48)
         self.comb += self.cd_sys.rst.eq(reset_delay != 0)
         self.comb += self.cd_usb_12.rst.eq(reset_delay != 0)
-
-        # 48MHz oscillator
-        clk48 = Signal()
-        self.specials += Instance(
-            "SB_HFOSC",
-            i_CLKHFPU=1,
-            i_CLKHFEN=1,
-            o_CLKHF=clk48
-        )
-        platform.add_period_constraint(clk48, 1e9 / 48e6)
-        self.comb += self.cd_usb_48.clk.eq(clk48)
 
         # Power On Reset
         self.sync.por += If(reset_delay != 0, reset_delay.eq(reset_delay - 1))
