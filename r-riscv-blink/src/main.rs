@@ -9,6 +9,7 @@ use riscv_rt::entry;
 mod timer;
 mod leds;
 mod print;
+mod usb_eptri;
 
 use timer::Timer;
 use leds::Leds;

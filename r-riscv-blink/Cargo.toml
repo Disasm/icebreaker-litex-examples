@@ -11,6 +11,10 @@ icebesoc-pac = { path = "../rust/icebesoc-pac" }
 riscv-rt  = "0.7.0"
 panic-halt = "0.2"
 
+[dependencies.usb-device]
+git = "https://github.com/mvirkkunen/usb-device"
+rev = "54850170e4112acaac08af13e0ca48203444dc26"
+
 [profile.release]
 # Keep debug information for release builds, for easier debugging.
 # It will be removed during the conversion to the .dfu file.
