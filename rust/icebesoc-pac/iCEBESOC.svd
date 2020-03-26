@@ -478,6 +478,7 @@ to perform half-duplex operations, using this SPI core.]]></description>
             <registers>
                 <register>
                     <name>PULLUP_OUT</name>
+                    <description><![CDATA[GPIO Output(s) Control.]]></description>
                     <addressOffset>0x0000</addressOffset>
                     <resetValue>0x00</resetValue>
                     <size>32</size>
@@ -807,11 +808,26 @@ contents of the FIFO.]]></description>
                     </fields>
                 </register>
                 <register>
+                    <name>IN_STALL_STATUS</name>
+                    <addressOffset>0x003c</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-only</access>
+                    <fields>
+                        <field>
+                            <name>in_stall_status</name>
+                            <msb>15</msb>
+                            <bitRange>[15:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
+                <register>
                     <name>OUT_DATA</name>
                     <description><![CDATA[Data received from the host will go into a FIFO.  This register reflects the
 contents of the top byte in that FIFO.  Reading from this register advances the
 FIFO pointer.]]></description>
-                    <addressOffset>0x003c</addressOffset>
+                    <addressOffset>0x0040</addressOffset>
                     <resetValue>0x00</resetValue>
                     <size>32</size>
                     <access>read-only</access>
@@ -833,7 +849,7 @@ to disable it. Resetting the OutHandler will set all ``enable`` bits to 0.
 
 Similarly, you can adjust the ``STALL`` state by setting or clearing the
 ``stall`` bit.]]></description>
-                    <addressOffset>0x0040</addressOffset>
+                    <addressOffset>0x0044</addressOffset>
                     <resetValue>0x00</resetValue>
                     <size>32</size>
                     <access>read-write</access>
@@ -871,7 +887,7 @@ Similarly, you can adjust the ``STALL`` state by setting or clearing the
                 <register>
                     <name>OUT_STATUS</name>
                     <description><![CDATA[Status about the current state of the `OUT` endpoint.]]></description>
-                    <addressOffset>0x0044</addressOffset>
+                    <addressOffset>0x0048</addressOffset>
                     <resetValue>0x00</resetValue>
                     <size>32</size>
                     <access>read-only</access>
@@ -901,7 +917,7 @@ Similarly, you can adjust the ``STALL`` state by setting or clearing the
                 </register>
                 <register>
                     <name>OUT_EV_STATUS</name>
-                    <addressOffset>0x0048</addressOffset>
+                    <addressOffset>0x004c</addressOffset>
                     <resetValue>0x00</resetValue>
                     <size>32</size>
                     <access>read-write</access>
@@ -916,7 +932,7 @@ Similarly, you can adjust the ``STALL`` state by setting or clearing the
                 </register>
                 <register>
                     <name>OUT_EV_PENDING</name>
-                    <addressOffset>0x004c</addressOffset>
+                    <addressOffset>0x0050</addressOffset>
                     <resetValue>0x00</resetValue>
                     <size>32</size>
                     <access>read-write</access>
@@ -931,7 +947,7 @@ Similarly, you can adjust the ``STALL`` state by setting or clearing the
                 </register>
                 <register>
                     <name>OUT_EV_ENABLE</name>
-                    <addressOffset>0x0050</addressOffset>
+                    <addressOffset>0x0054</addressOffset>
                     <resetValue>0x00</resetValue>
                     <size>32</size>
                     <access>read-write</access>
@@ -944,10 +960,40 @@ Similarly, you can adjust the ``STALL`` state by setting or clearing the
                         </field>
                     </fields>
                 </register>
+                <register>
+                    <name>OUT_ENABLE_STATUS</name>
+                    <addressOffset>0x0058</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-only</access>
+                    <fields>
+                        <field>
+                            <name>out_enable_status</name>
+                            <msb>15</msb>
+                            <bitRange>[15:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>OUT_STALL_STATUS</name>
+                    <addressOffset>0x005c</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-only</access>
+                    <fields>
+                        <field>
+                            <name>out_stall_status</name>
+                            <msb>15</msb>
+                            <bitRange>[15:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
             </registers>
             <addressBlock>
                 <offset>0</offset>
-                <size>0x54</size>
+                <size>0x60</size>
                 <usage>registers</usage>
             </addressBlock>
         </peripheral>
