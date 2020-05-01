@@ -179,7 +179,10 @@ class BaseSoC(SoCCore):
         assert hasattr(self.platform.toolchain, "yosys_template")
         assert hasattr(self.platform.toolchain, "build_template")
         self.platform.toolchain.yosys_template = [
+            "verilog_defaults -push",
+            "verilog_defaults -add -defer",
             "{read_files}",
+            "verilog_defaults -pop",
             "attrmap -tocase keep -imap keep=\"true\" keep=1 -imap keep=\"false\" keep=0 -remove keep=0",
             # Use "-relut -dffe_min_ce_use 4" to the synth_ice40 command. The "-reult" adds an additional
             # LUT pass to pack more stuff in, and the "-dffe_min_ce_use 4" flag prevents Yosys from
