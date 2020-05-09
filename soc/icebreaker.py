@@ -31,9 +31,11 @@ from litex.soc.integration.soc_core import soc_core_argdict, soc_core_args
 from litex.soc.integration.doc import AutoDoc
 
 from litex_boards.platforms.icebreaker import Platform, break_off_pmod
+from litex.build.generic_platform import *
 
 from litex.soc.cores.uart import UARTWishboneBridge
 from rtl.leds import Leds
+from rtl.sk9822 import SK9822
 
 import litex.soc.doc as lxsocdoc
 
@@ -169,6 +171,20 @@ class BaseSoC(SoCCore):
                 ["hledg5", "Green LED #5 on the iCEBreaker head."]])
 
         self.add_csr("leds")
+
+        sk9822_ext = [
+            ("sk9822", 0,
+                Subsignal("clock", Pins("4"), IOStandard("LVCMOS33")),
+                Subsignal("data", Pins("2"), IOStandard("LVCMOS33")),
+            ),
+        ]
+        platform.add_extension(sk9822_ext)
+        rgb = platform.request("sk9822")
+        self.submodules.sk9822 = SK9822(
+            rgb.clock,
+            rgb.data
+        )
+        self.add_csr("sk9822")
 
     def set_yosys_nextpnr_settings(self, nextpnr_seed=0, nextpnr_placer="heap"):
         """Set Yosys/Nextpnr settings by overriding default LiteX's settings.
