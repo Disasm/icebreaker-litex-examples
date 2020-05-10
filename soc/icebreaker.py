@@ -29,6 +29,7 @@ from litex.soc.integration.builder import Builder, builder_argdict, builder_args
 from litex.build.lattice.programmer import IceStormProgrammer
 from litex.soc.integration.soc_core import soc_core_argdict, soc_core_args
 from litex.soc.integration.doc import AutoDoc
+from litex.soc.interconnect import wishbone
 
 from litex_boards.platforms.icebreaker import Platform, break_off_pmod
 from litex.build.generic_platform import *
@@ -136,8 +137,19 @@ class BaseSoC(SoCCore):
         # for doing writes.
         spiflash_size = 16 * 1024 * 1024
         self.submodules.spiflash = SpiFlash(platform.request("spiflash4x"), dummy=6, endianness="little")
-        self.register_mem("spiflash", self.mem_map["spiflash"], self.spiflash.bus, size=spiflash_size)
         self.add_csr("spiflash")
+
+        l2_cache_size = 8192
+
+        if l2_cache_size != 0:
+            self.submodules.l2_cache = wishbone.Cache(
+                cachesize=l2_cache_size//4,
+                master=wishbone.Interface(32),
+                slave=self.spiflash.bus,
+            )
+            self.register_mem("spiflash", self.mem_map["spiflash"], self.l2_cache.master, size=spiflash_size)
+        else:
+            self.register_mem("spiflash", self.mem_map["spiflash"], self.spiflash.bus, size=spiflash_size)
 
         # Add ROM linker region
         self.add_memory_region("rom", self.mem_map["spiflash"] + flash_offset, spiflash_size - flash_offset, type="cached+linker")
