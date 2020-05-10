@@ -45,17 +45,8 @@ fn main() -> ! {
                 if i2 >= 12 {
                     i2 -= 12;
                 }
-                if i2 > 4 {
-                    i2 = 0;
-                }
 
-                DATA[i+1] = 0xe0002060 | ((i2 as u32) << 24);
-
-                // if i == index {
-                //     DATA[i+1] = 0xe2002060;
-                // } else {
-                //     DATA[i+1] = 0xe0000000;
-                // }
+                DATA[i+1] = 0xe4000000 | 0x00000206 * (i2 as u32);
             }
         }
         index += 1;
@@ -70,7 +61,7 @@ fn main() -> ! {
         while sk9822.status.read().busy().bit_is_set() { }
         print!("a");
         leds.toggle();
-        msleep(&mut timer, 160);
+        msleep(&mut timer, 100);
     }
 }
 
