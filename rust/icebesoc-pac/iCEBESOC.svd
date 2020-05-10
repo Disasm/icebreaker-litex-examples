@@ -528,9 +528,25 @@ to perform half-duplex operations, using this SPI core.]]></description>
                     </fields>
                 </register>
                 <register>
+                    <name>ADDRESS</name>
+                    <description><![CDATA[Memory address]]></description>
+                    <addressOffset>0x0004</addressOffset>
+                    <resetValue>0x00</resetValue>
+                    <size>32</size>
+                    <access>read-write</access>
+                    <fields>
+                        <field>
+                            <name>address</name>
+                            <msb>31</msb>
+                            <bitRange>[31:0]</bitRange>
+                            <lsb>0</lsb>
+                        </field>
+                    </fields>
+                </register>
+                <register>
                     <name>STATUS</name>
                     <description><![CDATA[SK9822 status]]></description>
-                    <addressOffset>0x0004</addressOffset>
+                    <addressOffset>0x0008</addressOffset>
                     <resetValue>0x00</resetValue>
                     <size>32</size>
                     <access>read-only</access>
@@ -541,44 +557,6 @@ to perform half-duplex operations, using this SPI core.]]></description>
                             <bitRange>[0:0]</bitRange>
                             <lsb>0</lsb>
                             <description><![CDATA[Transfer is in progress]]></description>
-                        </field>
-                    </fields>
-                </register>
-                <register>
-                    <name>DATA</name>
-                    <description><![CDATA[Pixel data]]></description>
-                    <addressOffset>0x0008</addressOffset>
-                    <resetValue>0x00</resetValue>
-                    <size>32</size>
-                    <access>read-write</access>
-                    <fields>
-                        <field>
-                            <name>red</name>
-                            <msb>7</msb>
-                            <bitRange>[7:0]</bitRange>
-                            <lsb>0</lsb>
-                            <description><![CDATA[Red intensity]]></description>
-                        </field>
-                        <field>
-                            <name>green</name>
-                            <msb>15</msb>
-                            <bitRange>[15:8]</bitRange>
-                            <lsb>8</lsb>
-                            <description><![CDATA[Green intensity]]></description>
-                        </field>
-                        <field>
-                            <name>blue</name>
-                            <msb>23</msb>
-                            <bitRange>[23:16]</bitRange>
-                            <lsb>16</lsb>
-                            <description><![CDATA[Blue intensity]]></description>
-                        </field>
-                        <field>
-                            <name>glob</name>
-                            <msb>28</msb>
-                            <bitRange>[28:24]</bitRange>
-                            <lsb>24</lsb>
-                            <description><![CDATA[Global intensity]]></description>
                         </field>
                     </fields>
                 </register>

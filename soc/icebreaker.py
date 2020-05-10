@@ -35,7 +35,7 @@ from litex.build.generic_platform import *
 
 from litex.soc.cores.uart import UARTWishboneBridge
 from rtl.leds import Leds
-from rtl.sk9822 import SK9822
+from rtl.sk9822dma import SK9822
 
 import litex.soc.doc as lxsocdoc
 
@@ -174,17 +174,18 @@ class BaseSoC(SoCCore):
 
         sk9822_ext = [
             ("sk9822", 0,
-                Subsignal("clock", Pins("4"), IOStandard("LVCMOS33")),
-                Subsignal("data", Pins("2"), IOStandard("LVCMOS33")),
+                Subsignal("clock", Pins("PMOD1A:0"), IOStandard("LVCMOS33")),
+                Subsignal("data", Pins("PMOD1A:1"), IOStandard("LVCMOS33")),
             ),
         ]
         platform.add_extension(sk9822_ext)
-        rgb = platform.request("sk9822")
+        sk9822 = platform.request("sk9822")
         self.submodules.sk9822 = SK9822(
-            rgb.clock,
-            rgb.data
+            sk9822.clock,
+            sk9822.data
         )
         self.add_csr("sk9822")
+        self.bus.add_master(name="sk9822", master=self.sk9822.wishbone)
 
     def set_yosys_nextpnr_settings(self, nextpnr_seed=0, nextpnr_placer="heap"):
         """Set Yosys/Nextpnr settings by overriding default LiteX's settings.
